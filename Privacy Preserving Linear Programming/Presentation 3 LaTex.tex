@@ -1,0 +1,502 @@
+\documentclass[9pt]{beamer}
+\usetheme{Copenhagen}
+\useoutertheme{smoothbars}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\graphicspath{ {photos/} }
+\renewcommand{\baselinestretch}{1.09}
+\usepackage{wrapfig}
+%\newcommand\Fontvi{\fontsize{7}{6}\selectfont}
+\title{Privacy Preserving Linear Programming}
+\author{Mansi Goel}
+\institute{Department of Mathematics \\ School of Natural Sciences \\ Shiv Nadar University }
+\logo{\includegraphics[scale=0.08]{snu.png}}
+
+\begin{document}
+\begin{frame}
+\titlepage
+\date{\today}   
+\end{frame}
+
+\begin{frame}
+\frametitle{Table of contents}
+\tableofcontents
+\end{frame}
+
+
+%NEW SECTION
+\section{Introduction}
+
+\begin{frame}
+\frametitle{What is Privacy Preserving Linear Programming?}
+With the rapid increase in computing, storage, and networking resources, data is not only collected and stored, but also analyzed. This creates a serious privacy problem which often inhibits the use of this data.\\
+\vspace{0.2cm}
+In this presentation, we investigate the solving of a fundamental optimization problem — a linear program which is formulated by combining the data of p entities which are unwilling to make their data public. \\
+\end{frame}
+
+\begin{frame}{What is Privacy Preserving Linear Programming?}
+The linear program using a random linear transformation that will:\\
+\vspace{0.1cm}
+\begin{itemize}
+    \item Not reveal any of the privately held data.
+    
+    \item Give a publicly available exact minimum value to the original linear program. 
+    
+    \item Components of the solution vector corresponding to each entity can be decoded only by the entity and revealed only if the owners agree.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Examples}
+\includegraphics[scale=0.25]{yao1.png}
+\includegraphics[scale=0.25]{yao2.png} 
+\end{frame}
+
+\begin{frame}{Examples}
+\centering
+\includegraphics[scale=0.4]{eg.png}\\
+\vspace{0.1cm}
+Royal Dutch Shell and Cargill wish to transport Crude Oil and Cotton respectively with the common goal of minimizing cost of transportation. They do not wish to reveal their data such as amount of crude oil/cotton which can be transported in one tanker, the restrictions on transport quantity etc. 
+\end{frame}
+
+
+%NEW SECTION
+\section{PPLP}
+
+\begin{frame}
+\frametitle{Notations}
+\begin{itemize}
+    \item All vectors are column vectors unless transposed to a row vector by a prime '.
+    
+    \vspace{0.1cm}
+    \item $ A \in \mathbb{R}^{m \times n} $ signifies a real $ m \times n $ matrix.
+    
+    \vspace{0.1cm}
+    \item For a vector $ x \in \mathbb{R}^{n} $ , $ x_j $ signifies the j-th component or j-th block of components.
+    
+    \vspace{0.1cm}
+    \item For a matrix A, $ A_i $ signifies the i-th component or block of components.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Formulating the Problem}
+We consider the linear program,
+\begin{equation}
+\min _{x \in X} c^{\prime} x \text { where } X=\{x \mid A x \geq b\},
+\end{equation}
+\vspace{0.1cm}
+Where, $ A \in \mathbb{R}^{m \times n} $, the cost vector $ c \in \mathbb{R}^{n} $ and X represents the feasible region. \\
+\vspace{0.3cm}
+
+The matrix A along with the cost vector c, that is $
+\left[\begin{array}{l}
+c^{\prime} \\
+A
+\end{array}\right]
+$ is divided into \textbf{p vertical blocks}, each blocked own by a distinct entity that is unwilling to make it's block of data public.\\
+\vspace{0.2cm}
+
+Each block has $ (m+1) $ rows and $ n_i $, $ i = 1,..., p $ columns with $ n_1 + n_2 + ... + n_p = n $ . 
+\end{frame}
+
+\begin{frame}{Vertically Partitioned Data}
+\begin{center}
+   \includegraphics[scale=0.3]{VP1.png}\\ 
+\end{center}
+Each entity holds all the constraints but only some variables out of all the n variables. \\
+
+\vspace{0.1cm}
+For instance, in the example shown above, Royal Dutch Shell and Cargill hold all the transportation constraints but Royal Dutch Shell holds the variable Crude Oil and Cargill holds the variable Cotton. 
+\end{frame}
+
+\begin{frame}{Vertically Partitioned Data}
+\begin{center}
+   \includegraphics[scale=0.3]{VP2.png}
+\end{center}
+\end{frame}
+
+\begin{frame}{Problem Transformation}
+We wish to solve (1) without revealing any privately held data. We shall achieve this by proceeding as follows :\\
+
+\vspace{0.1cm}
+Each of the p entities chooses its own privately held random matrix $ {B}_{\cdot j} \in \mathbb{R}^{k \times n_{j}} $ , $ j = 1,...,p $ where $ k \geq n $ . A value of k is agreed upon by all the p entities such that $ k \geq n $. Define :\\
+\begin{equation}
+B=\left[B_{\cdot 1} B_{\cdot 2} \ldots \ldots B_{\cdot p}\right] \in \mathbb{R}^{k \times n}
+\end{equation}
+\vspace{0.1cm}
+
+Since B is a random matrix, its rank is n [2]. We choose $ k \geq n $ because we require rank of B as n to be able to define a transformation which will help formulate the secure LP. \\
+\vspace{0.1cm}
+
+\textbf{Note :} A random matrix is a matrix wherein each entry is a random variable. It has full rank with probability 1 i.e for a random matrix $ A \in \mathbb{R}^{m \times n} $, rank(A) = min\{m,n\}. 
+\end{frame}
+
+\begin{frame}{Problem Transformation}
+We now define the following transformation which takes x to u :
+\begin{equation}
+x=B^{\prime} u
+\end{equation}
+Here, B' is a rectangular matrix with rank as column rank so using Moore - Penrose inverse, \\
+(3) $ \implies $ \begin{equation}
+u=B\left(B^{\prime} B\right)^{-1} x 
+\end{equation}
+
+We now transform our original linear program into the following \textbf{secure linear program} :\\
+\begin{equation}
+\min _{u \in U} c^{\prime} B^{\prime} u \text { where } U=\left\{u \mid A B^{\prime} u \geq b\right\}
+\end{equation}
+\end{frame}
+
+\begin{frame}{Moore Penrose Inverse}
+Moore Penrose inverse $ A^{+} $ of a matrix A is a generalized inverse/pseudoinverse. 
+
+\begin{block}{Definition}
+For $ A \in \mathbb{R}^{m \times n} $, a pseudoinverse of A is defined as a matrix $ A^{+} \in \mathbb{R}^{m \times n} $ satisfying:
+\begin{itemize}
+    \item $ A A^{+} A = A $
+    \item $ A^{+} A A^{+} = A^{+} $
+    \item $ (A A^{+})^{T} = A A^{+} $
+    \item $ (A^{+} A)^{T} = A^{+} A $
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Moore Penrose Inverse}
+$ A^{+} $ exists for any matrix A but when A has full rank i.e rank = min\{m,n\}, then $ A^{+} $ can be written as a simple formula:\\
+
+\vspace{0.1cm}
+\begin{itemize}
+    \item When A has full column rank, $ A^{+} = (A^{T} A)^{-1} A^{T} $. This constitutes a left inverse since, $ A^{+} A = I $.
+    
+    \item When A has full row rank, $ A^{+} = A^{T} (A A^{T})^{-1} $. This constitutes a right inverse since, $ A A^{+} = I $.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Problem Transformation}
+We refer to (5) as a secure LP since it does not reveal any of the privately held data $
+\left[\begin{array}{c}
+c_{j}^{\prime} \\
+A_{. j}
+\end{array}\right]
+$.\\
+\vspace{0.3cm}
+This is so because it's impossible to compute $ c_j $ and $ A_j $ from the revealed \\ products $ c_{j}^{\prime} B_{.j}^{\prime} $ and $ A_{.j}B_{.j}^{\prime} $ respectively without knowing $ B_{.j} $.\\
+
+\vspace{0.2cm}
+We now relate our original linear program (1) to the transformed linear program (5) in a way such that we are able to obtain a solution to (1) by solving (5). The following proposition helps us achieve that. 
+
+\begin{block}{Proposition}
+Let $k \geq n$ for the random matrix $B \in \mathbb{R}^{k \times n}$ of $(2) $. The secure linear program (5) is solvable (optimal solution exists) if and only if the linear program (1) is solvable in which case the extrema of both linear programs are equal.
+\end{block}
+\end{frame}
+
+
+%NEW SECTION
+\section{Duality Theory}
+
+\begin{frame}
+\frametitle{Primal and Dual Linear Programs}
+For any linear program (LP), there is a closely related LP called the \textbf{dual}. The feasible and optimal solutions of the dual provide useful information about the original LP which we refer to as the \textbf{primal}.\\
+
+\vspace{0.1cm}
+Consider the LP ,\\
+\includegraphics[scale=0.45]{lp.png}
+\hfill\includegraphics[scale=0.2]{dual.png}\\
+
+Graphically, the optimal solution of the above LP is (2,6) and the objective function value is 26. 
+\end{frame}
+
+\begin{frame}
+\frametitle{Primal and Dual Linear Programs}
+Given the above LP, we introduce another LP like, \\
+
+\includegraphics[scale=0.45]{lp2.png}
+\hfill\includegraphics[scale=0.2]{primal.png}\\
+\vspace{0.2cm}
+
+Graphically, the optimal solution of the above LP is (2,1) and the objective function value is 26. 
+\end{frame}
+
+\begin{frame}
+\frametitle{Construction of Dual}
+Consider the given LP called the \textbf{primal} where $ x \in \mathbb{R}^n $, $ c \in \mathbb{R}^n $, $ b \in \mathbb{R}^m $, $ A \in \mathbb{R}^{m \times n} $.\\
+\begin{equation} \tag{1}
+\begin{array}{rrclcl}
+\displaystyle \max_{x} & \multicolumn{2}{l}{c^T x} \\
+\textrm{s.t.} & A x & \leq & b \\
+& x & \geq & 0 \\
+\end{array}
+\end{equation}
+Given (1), we construct another LP called the \textbf{dual};
+
+\begin{equation} \tag{2}
+\begin{array}{rrclcl}
+\displaystyle \min_{w} & \multicolumn{2}{l}{b^T w} \\
+\textrm{s.t.} & A^T w & \geq & c \\
+& w & \geq & 0 \\
+\end{array}
+\end{equation}
+These LPs together are called the \textbf{primal - dual pair}.
+
+\begin{itemize}
+    \item No.of dual constraints = No.of primal variables
+    
+    \item No.of dual variables = No.of primal constraints
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Constructing of Dual}
+To decide the equalities and inequalities in the dual we use the following rule table;
+\begin{center}
+\includegraphics[scale=0.2]{rule.png}
+\end{center}
+
+For example,
+\begin{center}
+\includegraphics[scale=0.35]{PDeg.png}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Important Theorems}
+\begin{block}{Theorem 1 - Weak Duality}
+Let x be feasible for (1) and w be feasible for (2), then $ c^T x \leq b^T w $.
+\end{block}
+
+\textbf{Proof}: Since x and w are feasible for (1) and (2) we have \\
+$ A x \leq b $ , $ x \geq 0 $ \\
+and $ A^T w \geq c $ , $ w \geq 0$ \\
+
+$ A x \leq b \Rightarrow $ $ x^T A^T \leq b^T \Rightarrow$ $ x^T A^T w \leq b^T w$\\
+
+$ A^T w \geq c \Rightarrow $ $ w^T A \geq c^T \Rightarrow$ $ w^T A x \geq c^T x$\\
+
+Since $ x^T A^T w $ is a scalar, $ x^T A^T w = w^T A x $\\
+
+Therefore, $ c^T x \leq w^T A x \leq b^T w $
+
+\begin{block}{Corollary 1}
+Let $ \bar{x} $ be feasible for (1) and $ \bar{w} $ be feasible for (2). Also let $ c^T \bar{x} = b^T \bar{w} $.\\
+Then, $ \bar{x} $ is optimal to (1) and $ \bar{w} $ is optimal to (2). 
+\end{block}
+\end{frame}
+
+\begin{frame}
+\frametitle{Important Theorems}
+\begin{block}{Theorem 2 - Strong Duality}
+\begin{itemize}
+    \item Let $ \bar{x} $ be an optimal solution of (1). Then $ \exists $ a $ \bar{w} $ which is optimal to (2) and $ c^T \bar{x} = b^T \bar{w} $. 
+    \item Let $ w^* $ be an optimal solution of (2). Then $ \exists $ a $ x^* $ which is optimal to (1) and $ c^T x^* = b^T w^* $. 
+\end{itemize}
+\end{block}
+
+\begin{block}{Theorem 3 - Existence Theorem}
+Exactly one of the following statements are true: 
+\begin{itemize}
+    \item If (1) and (2) both have feasible solutions then both have optimal solutions.
+    \item If (1) (or (2)) has an unbounded solutions, then (2) (or (1)) is infeasible.
+    \item If (1) (or (2)) is infeasible but (2) (or (1)) is feasible then (2) will have unbounded solution. 
+\end{itemize}
+\end{block}
+\end{frame}
+
+
+%NEW SECTION
+\section{Proposition}
+
+\begin{frame}{Proposition}
+\begin{block}{Proposition}
+Let $k \geq n$ for the random matrix $B \in \mathbb{R}^{k \times n}$ of $(2) $. The secure linear program (5) is solvable (optimal solution exists) if and only if the linear program (1) is solvable in which case the extrema of both linear programs are equal.
+\end{block}
+
+\vspace{0.1cm}
+The original LP :
+\begin{equation} \tag{1}
+\min _{x \in X} c^{\prime} x \text { where } X=\{x \mid A x \geq b\},
+\end{equation}
+
+Dual of (1) :
+\begin{equation}
+\max _{v \in V} b^{\prime} v \text { where } V=\left\{v \mid A^{\prime} v=c, v \geq 0\right\}
+\end{equation}
+\end{frame}
+
+\begin{frame}{Proposition}
+The transformed LP :
+\begin{equation} \tag{5}
+\min _{u \in U} c^{\prime} B^{\prime} u \text { where } U=\left\{u \mid A B^{\prime} u \geq b\right\}
+\end{equation}
+
+Dual of (5) :
+\begin{equation}
+\max _{w \in W} b^{\prime} w \text { where } W=\left\{w \mid B A^{\prime} w=B c, w \geq 0\right\}
+\end{equation}
+
+So, we now have two primal-dual pairs namely (1)-(6) and (5)-(7).\\
+\vspace{0.2cm}
+The structure of the proof is as follows :
+\begin{enumerate}
+    \item (1) - (6) solvable $ => $ (5) - (7) solvable.
+    
+    \item (5) - (7) solvable $ => $ (1) - (6) solvable. 
+    
+    \item Optimal solution of (1) and (5) are the same.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Proof (Part 1)}
+(\Rightarrow) \\
+Let $ \bar{x} $ and $ \bar{v} $ be optimal solutions for (1) and (6) respectively (By Theorem 2). Define $ \bar{u} $ using (3) and (4) as $ \bar{x}=B^{\prime} \bar{u} \text { and } \bar{u}=B\left(B^{\prime} B\right)^{-1} \bar{x} $.\\
+\vspace{0.1cm}
+
+Now, $ \bar{u} $ satisfies the constraints of (5) since,\\
+\vspace{0.2cm}
+\begin{center}
+$ A B^{\prime} B\left(B^{\prime} B\right)^{-1} \bar{x} = A B^{\prime} B B^{-1} (B^{\prime})^{-1} \bar{x} = A \bar{x} \geq b $ \ [Using (1)]\\
+\end{center}
+\vspace{0.1cm}
+
+Since $ \bar{v} $ solves (6),
+\begin{equation}
+A^{\prime} \bar{v}=c, \quad \bar{v} \geq 0
+\end{equation}
+
+Consequently, 
+\begin{equation}
+B A^{\prime} \bar{v}=B c, \quad \bar{v} \geq 0
+\end{equation}
+
+Hence $ \bar{v} \in W $, the dual feasible region of (7) and $ \bar{u} \in U $. Consequently the dual pair (5) - (7) are both feasible and hence by Theorem 2 and Theorem 3 they are both solvable with equal extrema.\\
+\end{frame}
+
+\begin{frame}{Proof (Part 1)}
+Consequently, 
+\begin{equation}
+c^{\prime} B^{\prime} \bar{u}=c^{\prime} \bar{x}=\min _{x \in X} c^{\prime} x=\max _{v \in V} b^{\prime} v=b^{\prime} \bar{v} \leq \max _{w \in W} b^{\prime} w=\min _{u \in U} c^{\prime} B^{\prime} u
+\end{equation}
+\\
+
+The inequality follows from the fact that $ \bar{v} $ is feasible for (7). The equality after that follows from the fact extrema of the primal - dual pair (5) - (7) are equal.\\
+
+So, we get $$ c^{\prime} B^{\prime} \bar{u} \leq \min _{u \in U} c^{\prime} B^{\prime} u $$ but since $ \bar{u} $ is feasible for (5), it is indeed the optimal solution for (5).\\
+\vspace{0.2cm}
+
+Hence, $ \bar{u} = B\left(B^{\prime} B\right)^{-1} \bar{x} $ is the optimal solution for (5). 
+\end{frame}
+
+\begin{frame}{Proof (Part 2)}
+(\Leftarrow)\\
+Conversely, let $ \bar{u} $ and $ \bar{w} $ be optimal solutions for (5) and (7) respectively (By Theorem 2). Let $ \bar{x}=B^{\prime} \bar{u} $. Now, $ \bar{x} $ satisfies (1) since $ A \bar{x} = A B^{\prime} \bar{u} \geq b $. \\
+Since $ \bar{w} $ solves (7) we have, 
+\begin{equation}
+B A^{\prime} \bar{w}=B c, \bar{w} \geq 0 
+\end{equation}
+
+Since, rank of B is n i.e the no.of columns, we can use the left inverse and it follows that, 
+\begin{equation}
+A^{\prime} \bar{w}=c, \bar{w} \geq 0
+\end{equation}
+
+Hence, $ \bar{w} \in V $, the dual feasible region of (6) and $ \bar{X} \in X $. Consequently the dual pair (1) - (6) are both feasible and hence by Theorem 2 and Theorem 3 they are both solvable with equal extrema.
+\end{frame}
+
+\begin{frame}{Proof (Part 3)}
+We have shown that linear program (1) is solvable if and only if the secure linear program (5) is solvable. It remains to show that the extrema of these two linear programs are equal.\\
+
+\vspace{0.1cm}
+Since $ \bar{w} \in W $ implies $ \bar{w} \in V $, it follows that
+\begin{equation}
+\max _{w \in W} b^{\prime} w=b^{\prime} \bar{w} \leq \max _{v \in V} b^{\prime} v
+\end{equation}
+
+Hence, 
+\begin{equation}
+\min _{u \in U} c^{\prime} B^{\prime} u=\max _{w \in W} b^{\prime} w \geq \min _{x \in X} c^{\prime} x=\max _{v \in V} b^{\prime} v \geq \max _{w \in W} b^{\prime} w=\min _{u \in U} c^{\prime} B^{\prime} u
+\end{equation}
+where the equalities above follow from the equality of optimal primal and dual objectives of linear programs, the first inequality follows from (10) and the second inequality from (13).\\
+\vspace{0.1cm}
+
+Thus, the extremas of (1) and (5) are equal i.e 
+$$ \min _{x \in X} c^{\prime} x=\min _{u \in U} c^{\prime} B^{\prime} u. $$
+\end{frame}
+
+%NEW SECTION
+\section{PPLP Algorithm}
+
+\begin{frame}{The Algorithm}
+\begin{itemize}
+    \item All p entities agree on a $ k \geq n $, the number of rows of the random matrix $ B \in \mathbb{R}^{k \times n} $ as defined earlier.
+    
+    \vspace{0.2cm}
+    \item Each entity generates its own privately held random matrix $ B_{·j} \in \mathbb{R}^{k \times n_j} $, j = 1,..,p , where $ n_j $ is the number of features held by entity j which results in the matrix $ B=\left[B_{\cdot 1} B_{\cdot 2} \ldots \ldots B_{\cdot p}\right] \in \mathbb{R}^{k \times n} $
+    \vspace{0.2cm}
+    
+    \item Each entity j makes public only its matrix product $ A_{·j} B_{·j}^′ $ as well as its cost coefficient product $ B_{·j} c_j $. These products don't reveal either $ A_{.j} $ or $ c_j$ but allow the public computation of the matrix and cost coefficient needed for the secure LP:
+    
+    $$
+A B^{\prime}=A_{.1} B_{.1}^{\prime} + A_{.2} B_{.2}^{\prime} +...+ A_{.p} B_{.p}^{\prime}
+$$
+
+    $$
+c^{\prime} B^{\prime}=c_1^{\prime} B_{.1}^{\prime} + c_2^{\prime} B_{.2}^{\prime}+...+c_p^{\prime} B_{.p}^{\prime}
+$$
+\end{itemize} 
+\end{frame}
+
+\begin{frame}{The Algorithm}
+\begin{itemize}
+    \item A public optimal solution vector u to the secure LP (5) and a public optimal objective function value $ c^{\prime} B^{′} u $ are computed. By the proposition , this optimal value equals the optimal objective function value of the original LP (1).
+    \vspace{0.2cm}
+    
+    \item Each entity computes its optimal solution vector $ x_j $ using $ x = B^{\prime} u $ as :
+    $$ x_j = B_{.j}^{\prime} u , j = 1,...,p $$
+    
+    %\vspace{0.2cm}
+    \item The solution component vectors $ x_j $, j = 1,...p, are revealed by its owners if a public solution vector to the original LP is agreed upon. Else the component vectors may be kept private if only the minimum value of (1) is needed, in which case that minimum value equals the the publicly available minimum value $ \min _{u \in U} c^{\prime} B^{\prime} u $ of the secure LP (5). 
+\end{itemize}  
+\end{frame}
+
+
+%NEW SECTION
+\section{Computational Results}
+
+\begin{frame}{Example 1}
+\begin{itemize}
+    \item Generate a random solvable LP with m = 100 and n = 1000. 
+    \item Partition columns of A and c into three groups with $ n_1 = 500 $, $ n_2 = 300 $ and $n_3 = 200 $. 
+    
+    \item Generate $ B_{.1} \in \mathbb{R}^{n \times n_1}$, $ B_{.2} \in \mathbb{R}^{n \times n_2}$, $ B_{.3} \in \mathbb{R}^{n \times n_3}$ 
+\end{itemize}
+\vspace{0.2cm}
+
+On solving the secure LP (5) and comparing its optimal objective value with that of (1), the two optimal objectives agreed to 14 significant figures. Computation time was 0.163 seconds. This was done using the CPLEX solver in MATLAB. 
+\end{frame}
+
+\begin{frame}{Example 2} 
+\includegraphics[scale=0.3]{Screenshot 2021-05-06 at 11.53.14 AM.png}
+\end{frame}
+
+\begin{frame}{Example 2}
+Solving the transformed LP we get, \\
+\vspace{0.2cm}
+\mathbf{$ u_1 = 0, u_2 = 0.3635, u_3 = 0, u_4 = 3.5763 $} and optimal value = 46.5\\    
+\vspace{0.2cm}
+
+Using the transformation we get, \\
+\vspace{0.2cm}
+\mathbf{$ x_1 = 3.75, x_2 = 0.75 $} and optimal value = 46.5   
+\end{frame}
+
+\begin{frame}{References}
+\begin{enumerate}
+    \item Mangasarian, O.L. Privacy-preserving linear programming. Optim Lett 5, 165–172 (2011). 
+    \item X. Feng and Z. Zhang. The rank of a random matrix. Applied Mathematics and Computation, 185:689–694, 2007.
+    \item Bazaraa MS, Jarvis JJ, Sherali HD (2011) Linear programming and Network Flows. Wiley, Hoboken. 
+    \item https://en.wikipedia.org/wiki/Moore–Penrose$_$inverse
+    \item https://www.mathworks.com/help/matlab/
+\end{enumerate}
+\end{frame}
+
+\end{document}
+  
