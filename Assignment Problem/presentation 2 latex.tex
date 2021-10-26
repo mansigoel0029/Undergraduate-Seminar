@@ -1,0 +1,547 @@
+\documentclass[9pt]{beamer}
+\usetheme{Copenhagen}
+\useoutertheme{smoothbars}
+\usepackage{graphicx}
+\graphicspath{ {photos/} }
+\renewcommand{\baselinestretch}{1.09}
+\usepackage{wrapfig}
+%\newcommand\Fontvi{\fontsize{7}{6}\selectfont}
+\newcounter{savedenum}
+\newcommand*{\saveenum}{\setcounter{savedenum}{\theenumi}}
+\newcommand*{\resume}{\setcounter{enumi}{\thesavedenum}}
+\title{A Model for Assigning Teaching Assistants to Courses}
+\author{Mansi Goel}
+\institute{Department of Mathematics \\ School of Natural Sciences \\ Shiv Nadar University }
+\logo{\includegraphics[scale=0.08]{snu.png}}
+
+\begin{document}
+\begin{frame}
+\titlepage
+\date{\today}   
+\end{frame}
+
+\begin{frame}
+\frametitle{Table of contents}
+\tableofcontents
+\end{frame}
+
+%FIRST SECTION
+\section{Linear Programming}
+
+\begin{frame}
+\frametitle{Linear Program}
+\begin{definition}
+A \textbf{linear program} is comprised of a set of variables, a system of linear equations and inequalities which constrain the variables, and an objective function of the variables which is to be maximized or minimized.\\
+\end{definition}
+\pause
+\centering
+\includegraphics[scale=0.50]{example of lp.png}
+\end{frame}
+
+\begin{frame}
+\frametitle{Solution of a Linear Program}
+A \textbf{half space} is a set \{ x \in \mathbb{R}^n :Ax $\leq \alpha$ \} or \{ x \in \mathbb{R}^n :Ax $\geq \alpha$ \} for any given $ A\in \mathbb{R}^n $ and $ \alpha \in \mathbb{R}$.\\
+\vspace{0.3cm}
+Then, we define a \textbf{polyhedron} as a finite intersection of half spaces.\\
+\vspace{0.1cm}
+The set of possible solutions of a linear program forms a polyhedron. The solution set of an LP is knows as the \textbf{feasible region}.\\
+\vspace{0.1cm}
+The constraints of a linear program can each be realized as half-spaces, and so their intersection forms a polyhedron. All feasible solutions are encapsulated by the polyhedron.\\
+\end{frame}
+
+\begin{frame}
+For example,\\
+\includegraphics[scale=0.30]{eg1.png}
+\includegraphics[scale=0.40]{eg2.png}
+\end{frame}
+
+\begin{frame}
+\frametitle{The Simplex Method}
+The simplex method provides an algorithm to traverse a polyhedron to find an optimal solution. The central idea behind the simplex method is that optimal solutions are found among the vertices of the polyhedron. It methodically examines the value at each vertex to find the value that yields the highest/lowest objective value depending on whether it's a maximization or minimization problem.\\
+\vspace{0.1cm}
+\pause
+This is done by moving from vertex to vertex of the polyhedron, and checking each adjacent vertex. If every neighboring vertex decreases the objective value or does not increase the objective value(maximization problem),the process finishes and the current vertex is the optimal solution.  
+\end{frame}
+
+\begin{frame}{Example}
+\begin{block}{Question}
+Consider a farmer who is trying to decide what animals she should buy to raise on her farm. She wants to buy cows and chickens, and would like to purchase as many total animals as she can with the money she has. Say cows cost \$ \mathbb{$200$} each and chickens cost \$\mathbb{$20$} each, and the farmer has \$\mathbb{$1050$} to spend. Assume our farmer wants at least one cow and at least four times as many chickens as cows, but her coop will hold no more than 20 chickens.
+\end{block}
+
+\begin{align*}
+    \text{max} \quad
+x+y& \\ \text{s.t.} \quad 200x + 20y &\leq 1050 \\
+x &\geq 0\\
+y &\geq 4x\\
+y &\leq 20
+\end{align*}
+\end{frame} 
+
+\begin{frame}{Example}
+\vspace{0.2cm}
+\begin{flushleft}
+Graphing the constraints;
+\end{flushleft}
+\vspace{0.2cm}
+\centering
+\includegraphics[scale=0.30]{example.png}
+\end{frame}
+
+\begin{frame}{Example}
+Starting with any arbitrary vertex, we find the optimal solution by traversing the vertices until we cannot improve our objective value by traveling to a new vertex.\\
+\centering
+\includegraphics[scale=0.25]{Screenshot 2021-03-18 at 10.49.49 PM.png}
+\begin{itemize}
+    \item Starting with (1,4), now we can move upwards to (1,20) to get 21 or to the right diagonal to get 18.75. We choose to move up.
+    \pause
+    \item We again move to the right to get 23.25. 
+    \pause
+    \item We cannot move further as all neighbours have strictly lower objective function values. 
+\end{itemize}
+\pause
+Thus, our optimal solution is \textbf{(3.25,20)}
+\end{frame}
+
+\begin{frame}{Example}
+From the example above, we observe that the farmer should purchase 3.25 cows and 20 chickens. \\
+\vspace{1cm}
+
+As one might expect, it is unrealistic for the farmer to purchase one quarter of a cow. Instead we must find some way to extract a \textbf{feasible integer solution}. This can be done using the \textbf{branch and bound method}.
+\end{frame}
+
+
+%NEW SECTION 
+\section{Integer Programming}
+
+\begin{frame}{Integer Programming}
+\begin{definition}
+As observed in the above example, many real life problems when modelled as linear programming problems, require that some or all of the variables be integers. Such problems are called \textbf{integer linear programming problems}.
+\end{definition}\\
+For Example,\\
+
+\centering
+\includegraphics[scale=0.25]{ilp.png}
+\end{frame}
+
+\begin{frame}{Branch and Bound Method}
+Branch and Bound method is an efficient way to examine all possible integer feasible points and arrive at an integer optimal solution depending on which variables are constrained to be integers. \\
+\vspace{1cm}
+\pause
+We define an \textbf{associate LP} in which we allow the variables to take real values instead of integer values and we can arrive at an optimal integer solution by solving a sequence of real-valued linear programs.
+\end{frame}
+
+\begin{frame}{Branch and Bound Method}
+\begin{itemize}
+    \item We solve the associate LP and if we achieve an optimal integer solution, we stop.
+    \pause
+    \item Otherwise, we branch our problem into two LPs based on the variable which is constrained to be an integer but has a fractional value. 
+    \pause
+    \item Solve the two branched problems and compare it to the optimal value we currently have.
+    \pause
+    \item If we find a solution that gives a better objective value than our optimal solution, but is not integer, we repeat the process.
+    \pause
+    \item All sub problems that yield worse objective values than the current optimal integer solution will be eliminated.
+\end{itemize}
+In this way, we eventually reach an optimal integer solution.
+\end{frame}
+
+\begin{frame}{Branch and Bound Method}
+\centering
+\includegraphics[scale=0.45]{Fig10.jpg}
+\end{frame}
+
+\begin{frame}{Branch and Bound Method}
+We now revisit the farmer problem example and we will now use branch and bound to attain an optimal integer solution.\\
+\vspace{0.2cm}
+\pause
+On solving the LP, we had got our solution as x = 3.25 cows, y = 20 chickens, and an objective function value of x + y = 23.25.\\
+\vspace{0.2cm}
+\pause
+Seeing this has a non-integer solution, we now apply branch and bound. Bounding our solution, we will now branch into two sub cases: x = 3 and x = 4.
+\end{frame}
+
+\begin{frame}{Branch and Bound Method}
+With x = 3 we apply the simplex method again to get an objective function value of 23 with y = 20. Since both x and y are integral, we hold 23 as our current optimal integer solution while we test other cases.\\
+\pause
+Likewise with x = 4 we apply the simplex method and find that the solution is infeasible. This is because when the farmer purchases 4 cows, she must also purchase at least 16 chickens, which costs her \$ 1120 total, exceeding her budget.\\
+\centering
+\includegraphics[scale=0.30]{Screenshot 2021-03-19 at 12.01.55 AM.png}\\
+\pause
+Thus, we have obtained our optimal solution as 3 cows, 20 chickens and 23 total animals on the farm. 
+\end{frame}
+
+%NEW SECTION 
+\section{TA Assignment Problem}
+
+\begin{frame}{Introduction}
+Every quarter, university students attend discussion sections led by graduate students in the hope of better understanding the content from the lectures.\\
+
+\vspace{0.2cm}
+The graduate students, called teaching assistants (hereafter referred to as TAs) who lead these sections are assigned by hand by the department.\\
+\pause
+\vspace{0.2cm}
+The manual assignment process is usually carried out in two steps :
+\begin{itemize}
+    \item The staff surveys all graduate students to find out what classes they would prefer to teach and when they are unavailable to teach. 
+    \item Match the graduate students to the available classes, trying to produce a fair and balanced assignment. 
+\end{itemize}
+\end{frame} 
+
+\begin{frame}{Introduction}
+Some of the disadvantages of a manually generated schedule include:
+\begin{itemize}
+    \item Time spent by the staff
+    \pause
+    \item Lack of consistency from year to year
+    \pause
+    \item Introduction of human bias
+    
+\end{itemize}\\
+\vspace{0.3cm}
+\pause
+A mathematical model can overcome these disadvantages and produce an impartial, consistent assignment in less time which could prove as an excellent resource for the staff responsible for assigning the TAs.\\
+\vspace{0.4cm}
+We now begin modelling our TA assignment problem. 
+\end{frame} 
+
+\begin{frame}{Modelling Happiness}
+In order to define TA happiness, we considered five main components:
+\begin{itemize}
+    \item Which courses the TA prefers to teach.
+    \pause
+    \item Which times of the day the TA prefers to teach.
+    \pause
+    \item Whether the TA prefers to teach sections from the same course.
+    \pause
+    \item Whether the TA prefers to teach sections on the same day. 
+    \pause
+    \item Whether the TA prefers to teach back-to-back sections.
+\end{itemize}
+\vspace{0.1cm}
+Each of these components factors into our objective function in a different way, but contributes to the overall satisfaction of the TAs. \\
+\vspace{0.2cm}
+We will now model each of these components individually. 
+\end{frame} 
+
+\begin{frame}{Course Preference}
+Each TA has their own mathematical interests that lead them to find certain undergraduate courses more enjoyable to teach than others. We define the following notations : \\
+\vspace{0.1cm}
+T : set of TAs\\
+C : set of courses\\
+$i \in$ T is a TA$\\
+k $\in$ C is a course$\\
+$ x_{ij} $ : binary assignment variable to represent whether TA i $ \in $ T is assigned to section j $ \in $ S.\\
+$\star$ : denotes a course that is preferred by that TA$\\
+$\diamond$ : indicates indifference\\
+$\otimes$ : denotes a course that is not preferred by that TA$\\
+\vspace{0.1cm}
+\end{frame}
+
+\begin{frame}{Course Preference}
+Now we give each TA-course pair a numerical value $\emph{p}_{ik}$ on a scale from 0 to 100 that represents how much TA i likes course k.\\
+\vspace{0.1cm}
+A score of 100 is awarded to the TA’s favorite class, 0 to the TA’s least favorite class,50 to all courses towards which the TA is indifferent. We assign a normalized value to every other course based on the total number of courses.
+\end{frame} 
+
+\begin{frame}{Course Preference}
+For example,\\
+\vspace{0.5cm}
+\begin{wrapfigure}{l}{0.25\textwidth}
+    \centering
+    \includegraphics[scale=0.20]{Screenshot 2021-03-21 at 12.46.42 PM.png}
+\end{wrapfigure}
+Diane gives Combinatorics a 100. Then, Analysis a 83.3 and Algebra a 66.6, since these two numbers evenly split the interval between 50 and 100 into three equal parts.\\
+\vspace{0.2cm}
+\pause
+Now define $ \Phi_{ik} $ the (positive) rank that TA i gives course k if i likes k$\\ 
+and $ \phi_{ik} $ the (negative) rank i gives k if i dislikes k$. \\
+Then to account for indifference and normalizing, we let $ L_i $ the set of courses liked by i,  \textbf{$D_i$} the set of courses disliked by i, and then formally define $p_{ik} $ as follows:\\
+\vspace{0.2cm}
+\centering
+\includegraphics[scale=0.30]{Screenshot 2021-03-21 at 1.09.25 PM.png}
+\end{frame} 
+
+\begin{frame}{Time of Day Preference}
+As with courses, TAs have (often strong) preferences about what times of day they prefer to hold discussion sections. We can use our ranking model from above to assign numerical values to these preferences as well.For simplicity, we will divide a day into \textbf{Morning, Afternoon, and Evening}.\\
+\vspace{0.2cm}
+\pause
+Again, we use $ \star $ to denote preferred times to teach,$ \otimes $ to denote disliked times to teach, and $ \diamond $ to denote indifference.\\
+\vspace{0.2cm}
+\pause
+As before, define $ \Psi_{it} $ the (positive) rank that TA i gives time t if i likes t$\\ 
+and $ \psi_{it} $ the (negative) rank i gives t if i dislikes t$. $These are calculated in the same way as \Phi  and  \phi. $ \\
+\vspace{0.2cm}
+We also account for indifference and normalizing the same way: given $ T_i $ the set of times liked by i, and $ \tau_i $ the set of times disliked by i, we define the time preference pit as follows:
+\end{frame} 
+
+\begin{frame}{Time of Day Preference}
+$$
+p_{i t}=\left\{\begin{array}{lr}
+100-\frac{50}{\left|T_{i}\right|}\left(\Psi_{i t}-1\right) ; & i \text { likes } t ; \\
+50 ; & i \text { is indifferent towards } t ; \\
+0+\frac{50}{\left|\tau_{i}\right|}\left(\psi_{i t}-1\right) ; & i \text { dislikes } t ;
+\end{array}\right.
+$$
+\\
+\vspace{0.2cm}
+\pause
+For example, Diane gives Evening a 100, Afternoon a 75 and 0 to Morning.\\
+\centering
+\includegraphics[scale=0.40]{Screenshot 2021-03-21 at 8.00.19 PM.png}
+\end{frame} 
+
+\begin{frame}{Section Preference}
+A given section j has both a corresponding course k and a corresponding time of day t. So for a TA i, we have two values to look at when considering section preference, namely $ p_{ik} $ and $ p_{it} $. These two values have different weights to different TAs.\\
+\vspace{0.2cm}
+\pause
+Thus to define $ p_{ij} $, the preference of TA i for section j, we have implemented a weight system with the following five choices:\\
+\vspace{0.2cm}
+\begin{center}
+\includegraphics[scale=0.40]{Screenshot 2021-03-21 at 10.24.41 PM.png}\\
+\end{center}
+\pause
+In this way, we can gather $ p_{ij} $ for every TA i and section j but this is only part of the data we need; as we will see, it is not just the individual courses but rather the combination of courses that makes a TA teaching schedule good or bad.
+\end{frame} 
+
+\begin{frame}{Sections from The Same Course}
+One of the most important components to the happiness of several TAs is being able to teach sections from the same course. Presumably, the fewer distinct courses among sections a TA is teaching, the less time that TA must spend preparing material from different topics. We model this as follows :\\
+\vspace{0.3cm}
+\pause
+Let C the set of courses, i $ \in $ T a TA, j $ \in $ S a section, k  $ \in $ C a course, and l $ \in $ C the course of section j. Then we define $ \delta_{kl} $ a simple binary indicator of whether l and k are the same section\\
+\end{frame}
+
+\begin{frame}{Section from the Same Course}
+Now, we define a binary variable $ q_{ik} $ such that it is \textbf{1 if TA i is assigned to at least one section of course k} and 0 otherwise.To force this, we write:\\
+\begin{center}
+    \includegraphics[scale=0.40]{q_ik.png}
+\end{center}
+\pause
+Where m is the maximum number of units a TA can teach whch is included here as a normalizer to ensure that $ q_{ik} $ does not exceed 1.This helps to force $ q_{ik} $ into its proper position - if TA i is assigned to teach section j and section j is from course k, then l = k so we have that $ \delta_{kl} $ = 1 and $ x_{ij} $ = 1. So the right-hand side is strictly greater than zero and since $ q_{ik} $ is binary, this means it must be set to 1.\\
+\end{frame} 
+
+\begin{frame}{Sections from the Same Course}
+Now we can define, $ z_i $ : total number of distinct courses that TA i is teaching sections from as:\\
+\begin{center}
+\includegraphics[scale=0.40]{zi.png}\\
+\end{center}
+\pause
+\textbf{Remark} : Every TA wants a $ z_i $ of 1, but that is more difficult for a TA who is teaching 4 sections versus one who is teaching only 1 section. \\
+\vspace{0.15cm}
+\pause
+So, we also need to account for the total number of sections that TA i is teaching, which we denote by $ \mu_i $. We want a function f that rewards the LP for giving few courses to TAs with many sections. We take our f to be:\\ 
+\begin{center}
+\includegraphics[scale=0.40]{f.png}\\
+\end{center}
+We add the 1 to ensure that f never gives a value of zero. Thus the lowest value f can return is 1, which happens when $ \mu_i $ = $ z_i $.\\ 
+\vspace{0.1cm}
+\pause
+\textbf{Note} : As $ \mu_i $ increases, we would like to keep $ z_i $ low. Since $ \mu_i $ is unchangeable data, but $ z_i $ depends on the assignments that the LP makes, the LP will attempt to keep it small; that is, prevent TAs from teaching sections from too many distinct courses.
+\end{frame} 
+
+\begin{frame}{Sections on the Same Day}
+We want to define a measure for the number of days a TA must teach on. Some TAs might prefer to teach all of their sections on the same day, while others would rather spread their sections throughout the week. We model this as follows:\\
+\vspace{0.1cm}
+\pause
+Let D be the set of days of the week, j a section and d $ \in $ D a day of the week. Then , we define $ v_{jd} $ the binary indicator of whether section j is held on day d.\\
+\vspace{0.1cm}
+\pause
+Now, we define a binary variable $ y_{id} $ such that it is \textbf{1 is TA i is teaching on day d} and 0 otherwise. To force this, we write:\\
+\begin{center}
+    \includegraphics[scale=0.26]{y.png}\\
+\end{center}
+\pause
+If TA i is teaching section j, and section j is held on day d, then $ v_{jd} $ = 1 and \\ $ x_{ij} $ = 1, so the RHS is strictly greater than zero, which forces $ y_{id} $ to be 1 since it is binary.\\
+\end{frame} 
+
+\begin{frame}{Sections on the Same Day}
+Now we define $ v_i $ : the total number of days on which TA i teaches as:\\
+\begin{center}
+    \includegraphics[scale=0.30]{v.png}
+\end{center}
+\pause
+As with number of courses, we need to normalize $ v_i $ over the number of sections $ \mu_i $. We use the same function as before:\\
+\begin{center}
+    \includegraphics[scale=0.50]{g.png}
+\end{center}
+Here, as before, g will take a higher value when a TA with many sections has few days.
+\end{frame} 
+
+\begin{frame}{Back to Back Sections}
+%\Fontvi
+Some TAs prefer to have their sections close to each other while others would rather have them spaced out.This is not the same as having sections on the same day: a TA could prefer to have sections on the same day but not immediately back-to-back. We model this as follows:\\
+\vspace{0.3cm}
+\pause
+First, for a TA i and sections j, $ j^{'} $, we define $ v_{jj^'} $ the binary indicator of whether sections j and $ j^{'} $ are back-to-back. This can be calculated ahead of time simply using section data.\\
+\end{frame}
+
+\begin{frame}{Back to Back Sections}
+Next, we want to identify back-to-back sections assigned to TAs. For this, define $ \beta_{ijj^'} $ the binary indicator of whether TA i is teaching back-to-back sections j and $ j^{'} $. To force $ \beta_{ijj^'} $ to take proper values, we write:
+\pause
+\begin{center}
+    \includegraphics[scale=0.30]{Screenshot 2021-03-22 at 9.40.04 PM.png}
+\end{center}
+\vspace{0.1cm}
+\pause
+\begin{center}
+    \includegraphics[scale=0.40]{tab.png}\\
+\end{center}
+\end{frame} 
+
+\begin{frame}{Back to Back Sections}
+Now, to calculate the total number of pairs of back-to-back sections that are assigned to TA i, we add up all the $ \beta_{ijj^'} $ and call it $ w_{ij} $:
+\begin{center}
+    \includegraphics[scale=0.30]{w.png}\\
+\end{center}
+\pause
+Once again, we normalize over the number of sections a TA is teaching, $ \mu_i $. We chose a function h defined by:
+\begin{center}
+    \includegraphics[scale=0.30]{h.png}\\
+\end{center}
+h returns a higher value when a TA has many sections but few back-to-back sections. We no longer need to add 1 here since $ \mu_i $ \textgreater $ w_{ij} $. 
+\end{frame} 
+
+\begin{frame}{Modelling Fairness}
+Now that we have an idea of how to model ”happiness”, we have to incorporate fairness into our model.\\
+\vspace{0.3cm}
+\pause
+\textbf{Fairness} can be described in terms of whether or not a TA deserves to be assigned to his or her preferred section. The staff of the Math department assign each TA a \textbf{numerical rank $ R_i $, ranging from 0 to 5}. When assigning these ranks, the staff takes into account factors like \textbf{prior performance, ability, and seniority}.\\
+\end{frame}
+
+\begin{frame}{Modelling Fairness}
+To see why fairness is an important piece of our model, consider two TAs, Edgar and Frank where Frank has a higher ranking than Edgar.\\
+\pause
+\begin{itemize}
+    \item Frank prefers course $ y^' $, then y and then other courses.
+    \item Edgar prefers only course y over other courses.
+    \item However, Frank’s schedule will not allow him to teach course $ y^' $. 
+\end{itemize}
+\pause
+If the model was based on happiness alone, Frank would have to teach some other course only because $ y^' $ had a time conflict while giving his second favorite course(y) to Edgar, who, based on his ranking, did not deserve to teach course y as much as Frank. 
+\end{frame} 
+
+\begin{frame}{The Objective Function}
+Now that we have modelled all of the factors, we will incorporate these in the objective function whose objective is to \textbf{maximise the satisfaction of the TAs}. Or, in other words, we want to maximize the number of TAs that are assigned to sections they prefer given their rank.\\
+\vspace{0.1cm}
+\pause
+Restating the factors modelled above:\\
+\begin{itemize}
+    \item Section preference $ p_{ij} $.
+    \pause
+    \item Teaching sections from the same course, represented by f($ \mu_i $ ,$ z_i $)
+    \pause
+    \item Teaching sections from the same day, represented by g($ \mu_i $ ,$ w_i $)
+    \pause
+    \item Teaching back-to-back sections, represented by h($ \mu_i $ ,$ v_i $)
+\end{itemize}
+\end{frame} 
+
+\begin{frame}{The Objective Function}
+As alluded before, TAs have different preferences, for example, some TAs prefer to teach sections on the same day, while others prefer not to. We account for these differences by including constants $ a_i $, $ b_i $, and $ c_i $ defined as:\\
+\pause
+\begin{center}
+\includegraphics[scale=0.35]{1.png}\\
+
+\includegraphics[scale=0.35]{2.png}\\
+
+\includegraphics[scale=0.35]{3.png}\\
+
+\end{center}
+\vspace{0.1cm}
+\pause
+Given all of the above preferences and constants, we now present the objective function:\\
+\vspace{0.3cm}
+
+\centering
+\sum_{i \in T} R_{i} *\left(a_{i} * f\left(\mu_{i}, z_{i}\right)+b_{i} * g\left(u_{i}, w_{i}\right)+c_{i} * h\left(\mu_{i}, v_{i}\right)+\sum_{j \in S} x_{i j} p_{i j}\right).
+\end{frame} 
+
+\begin{frame}{Constraints}
+Not just any set of variables are feasible solutions for our problem. We need to introduce some constraints on the variables as follows:
+\pause
+\begin{enumerate}
+    \item For every section j, we have\\
+$$
+\sum_{i \in T} x_{i j}=1
+$$
+which means that every section requires exactly one TA.
+\pause
+\item We require that every TA, i, meets their teaching duties. To ensure each TA i teaches exactly $ \mu_i $ sections we require:\\
+$$
+\sum_{j \in S} x_{i j}=\mu_{i}
+$$
+\saveenum
+\end{enumerate}
+\end{frame} 
+
+\begin{frame}{Constraints}
+Sections are divided into 3 categories - lower division UG, upper division UG and graduate. TAs in their first few quarters are restricted to teach lower division sections only. To formulate this constraints we use the notations - \textbf{$ L_T $ - set of TA only qualified to teach lower division sections}, \textbf{$ U_T $ - set of TA only qualified to teach UG sections}, \textbf{$ U_S $ - set of upper division UG sections},\textbf{$ G_S $ - set of graduate sections}.
+\vspace{0.1cm}
+\pause
+\begin{enumerate}
+\resume
+\item For TAs who were only allowed to teach lower division courses , we need:\\
+    $$
+\forall(i, j) \in L_{T} \times\left(U_{S} \cup G_{S}\right), x_{i j}=0
+$$
+\pause
+\item For TAs who were not allowed to teach graduate courses, we need:\\
+$$
+\forall(i, j) \in\left(L_{T} \cup U_{T}\right) \times G_{S}, x_{i j}=0
+$$
+\end{enumerate}
+\saveenum
+\end{frame}
+
+\begin{frame}{Constraints}
+\begin{enumerate}
+\resume
+\item For every TA i, we require that there is no overlap between the sections each TA teaches. For this, we define a binary indicator $ \Omega_{jj^'} $ which represents whether j and $ j^' $ overlap. Now, we define another binary indicator $ \xi_{ijj^'} $ of whether TA i is teaching overlapping sections j and $ j^' $. We force $ \xi $ to represent this by:\\
+$$
+\frac{1}{2} \Omega_{j j^{\prime}}\left(x_{i j}+x_{i j^{\prime}}\right) \geq \xi_{i j j^{\prime}} \geq \frac{1}{2} \Omega_{j j^{\prime}}\left(x_{i j}+x_{i j^{\prime}}-1\right)
+$$\\
+Now, to ensure this overlapping situation never occurs, we want, for every TA i:\\
+\centering
+\includegraphics[scale=0.30]{xi.png}
+%$
+%\sum_{j, j^{\prime} \in S \times S} \xi_{i j j^{\prime}}=0
+%$
+\end{enumerate}
+\end{frame} 
+
+\begin{frame}{Size of the Model}
+Linear programs are most often measured by the number of variables they introduce and the number of constraints they enforce. By examining these numbers, one can get an idea of the scale of our model and how it might perform in practice.\\
+\vspace{0.1cm}
+\pause
+\textbf{The Number of Variables:}
+\begin{itemize}
+    \item $x_{i j} \forall(i, j) \in T \times S$
+\item $q_{i k} \forall(i, k) \in T \times C$
+\item $y_{i d} \forall(i, d) \in T \times D$
+\item $\beta_{i j j^{\prime}} \forall\left(i, j j^{\prime}\right) \in T \times(S \times S)$
+\end{itemize}
+\pause
+So, a solution has to assign values to $ |T|*\left(|S|+|C|+|D|+|S|^{2}\right) $ variables. 
+\end{frame} 
+
+\begin{frame}{Size of the Model}
+\textbf{The Number of Constraints}
+\begin{itemize}
+    \item $|T|$ constraints to ensure each TA meets his or her teaching duties.
+ \item $|S|$ constraints to ensure each section has one TA.
+\item $|T| *|S|^{2}$ constraints ensure that no TA is assigned classes that occur at the same time.
+\item $\left|L_{T}\right|*\left(\left|U_{S}\right|+\left|G_{S}\right|\right)$ constraints ensure no TA unfit to teach Upper division and graduate level courses does so. Bound this above by $|T| *|S| $.
+\item $\left|U_{T}\right| *\left|G_{S}\right|$ constraints ensure no TA unfit to teach graduate courses does so. This can also be bounded above by $|T| *|S|$.
+\item We also have to take into account constraints due to TA schedule conflicts. Let this number of conflicts be $Q$.
+\end{itemize}
+\pause
+Then the total number of constraints is about $|T|+|S|+|T| *|S|^{2} + |T| *|S|+|T| * |S|+ Q $. 
+\end{frame} 
+
+\begin{frame}{Conclusion}
+This paper gives an insight into how a real life problem can be modelled into a linear programming problem. However, a theoretical model is good on paper but it does not help the TAs or the staff unless it is made practically accessible.  \\
+\vspace{0.2cm}
+For this purpose, this thesis has developed a web interface using SQLite and PHP. To solve the integer linear program, the SCIP (Solving Constraint Integer Programs) solver is used. The program has around about 20,000 variables and about 500,000 constraints. The software used allows the staff to reach an optimal assignment with less than 15 minutes of work.\\
+\vspace{0.2cm}
+The utilization of integer linear programming to solve the TA assignment problem gives one an idea of the power and versatility of integer linear programs. 
+\end{frame}
+\end{document}
